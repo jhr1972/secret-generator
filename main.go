@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"text/template"
 
@@ -119,7 +120,7 @@ func main() {
 	if err := yaml.Unmarshal(f, &lcs); err != nil {
 		log.Fatal(err)
 	}
-	var tmplFile = pathprefix + "secret.j2"
+
 	for i, v := range lcs.LeafCluster {
 		fmt.Printf("Name: %s\n", string(v.Name))
 		secret, err := clientset.CoreV1().Secrets(string(v.SaNamespace)).Get(context.TODO(), string(v.SaName), metav1.GetOptions{})
@@ -148,8 +149,9 @@ func main() {
 		}
 		fmt.Printf("Config\n%s", string(b))
 		lcs.LeafCluster[i].ConfigB64 = b64.StdEncoding.EncodeToString(b)
-
-		tmpl, err := template.New(tmplFile).ParseFiles(tmplFile)
+		var tmplFile = pathprefix + "secret.j2"
+		name := path.Base(tmplFile)
+		tmpl, err := template.New(name).ParseFiles(tmplFile)
 		if err != nil {
 			panic(err)
 		}
