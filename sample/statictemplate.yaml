@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  secret.j2: "\n---\napiVersion: v1\nkind: Secret\ntype: Opaque\nmetadata:\n  annotations:\n
+    \   managed-by: argocd.argoproj.io\n  labels:\n    source-secret: {{ .SaName }}\n
+    \   source-namespace: {{ .SaNamespace }}\n    argocd.argoproj.io/secret-type:
+    cluster\n  name: {{ .ArgoRef }}\n  namespace: {{ .ArgoNs}}\ndata:\n  name: {{
+    .ArgoRefB64  }}\n  server: {{ .UrlRefB64 }}\n  config: {{   .ConfigB64   }}\n
+    \  "
+kind: ConfigMap
+metadata:
+  name: sgsecret
+  namespace: hlb-gitops

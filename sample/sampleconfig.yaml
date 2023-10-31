@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  config.yaml: |-
+    ---
+    leafclusters:
+      - name: aws-e
+        sa-name: deployer-token-x4mxk
+        #sa-namespace: openshift-gitops
+        sa-namespace: hlb-gitops
+        argo-ns: argocd
+        argo-ref: entwicklung
+        url-ref: https://192.168.100.29:6443
+immutable: false
+kind: ConfigMap
+metadata:
+  name: sgconfig
+  namespace: hlb-gitops
