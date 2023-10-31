@@ -14,6 +14,7 @@ import (
 	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
@@ -53,8 +54,9 @@ func main() {
 	}
 	flag.Parse()
 	fmt.Printf("Running in mode %s \n", mode)
-	// Create a traced mux router
+
 	var kubeconfig *string
+	var clientset *kubernetes.Clientset
 	for {
 		if mode == "native" {
 
@@ -64,11 +66,32 @@ func main() {
 				kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 			}
 			pathprefix = ""
+			// use the current context in kubeconfig
+			config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+			if err != nil {
+				panic(err.Error())
+			}
+
+			// create the clientset
+			clientset, err = kubernetes.NewForConfig(config)
+			if err != nil {
+				panic(err.Error())
+			}
 			break
 		}
 		if mode == "k8s" {
 			fmt.Printf("Running in k8s mode")
 			pathprefix = "/mnt/"
+			// creates the in-cluster config
+			config, err := rest.InClusterConfig()
+			if err != nil {
+				panic(err.Error())
+			}
+			// creates the clientset
+			clientset, err = kubernetes.NewForConfig(config)
+			if err != nil {
+				panic(err.Error())
+			}
 			break
 
 		}
@@ -77,22 +100,12 @@ func main() {
 		os.Exit(-1)
 
 	}
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err.Error())
-	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
 	f, err := os.ReadFile(pathprefix + "config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
-	out, err := os.Create("newsecret.yaml")
+	out, err := os.Create("/tmp/newsecret.yaml")
 	if err != nil {
 		panic(err)
 	}
