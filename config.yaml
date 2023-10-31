@@ -1,0 +1,16 @@
+---
+leafclusters:
+  - name: aws-e
+    sa-name: token-test-token-9wmmw
+    #sa-namespace: openshift-gitops
+    sa-namespace: default
+    argo-ns: argocd
+    argo-ref: entwicklung
+    url-ref: https://192.168.100.29:6443
+  - name: plattform-e
+    sa-name: deployer-token-psp8r
+    sa-namespace: default
+    #sa-namespace: hlb-mgmt
+    argo-ns: gitops-plattform-e
+    argo-ref: entwicklung
+    url-ref: https://192.168.100.48:6443
