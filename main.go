@@ -111,6 +111,11 @@ func main() {
 		fmt.Printf("Name: %s\n", string(v.Name))
 		secret, err := clientset.CoreV1().Secrets(string(v.SaNamespace)).Get(context.TODO(), string(v.SaName), metav1.GetOptions{})
 		lcs.LeafCluster[i].Token = secret.Data["token"]
+		if len(lcs.LeafCluster[i].Token) == 0 {
+			fmt.Printf("Secret %s not found \n", v.SaName)
+			panic(fmt.Sprintf("Secret %s not found ", v.SaName))
+
+		}
 		lcs.LeafCluster[i].ArgoRefB64 = b64.StdEncoding.EncodeToString([]byte(lcs.LeafCluster[i].ArgoRef))
 		lcs.LeafCluster[i].UrlRefB64 = b64.StdEncoding.EncodeToString([]byte(lcs.LeafCluster[i].UrlRef))
 
